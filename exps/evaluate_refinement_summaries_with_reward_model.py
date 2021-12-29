@@ -131,7 +131,7 @@ def prepare_results():
                         outfile.write('\n')
 
 if __name__ == "__main__":
-    # prepare_results()
+    prepare_results()
     fire.Fire(
         experiment_def_launcher(
             experiment_dict=experiment_definitions(), main_fn=eval_refinements.main, mode="local"
