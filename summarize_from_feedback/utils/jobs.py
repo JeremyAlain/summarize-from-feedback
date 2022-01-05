@@ -31,9 +31,9 @@ def launch(job: Job):
         env["JOB_NAME"] = H.name
         subprocess.check_call(
             [
-                #"mpiexec",
-                #"-n",
-                #str(H.mpi),
+                "mpiexec",
+                "-n",
+                str(H.mpi),
                 "python",
                 "-c",
                 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()',
