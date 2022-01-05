@@ -15,7 +15,7 @@ from summarize_from_feedback import tasks
 from summarize_from_feedback.datasets.jsonl_encoding import encode_example
 
 def experiment_definitions():
-    device = "cpu"
+    device = "cuda"
     reward_model_spec = combos(
         bind("device", device),
         bind("load_path", "https://openaipublic.blob.core.windows.net/summarize-from-feedback/models/rm4"),
