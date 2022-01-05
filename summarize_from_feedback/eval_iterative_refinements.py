@@ -3,7 +3,6 @@ import os
 from dataclasses import dataclass, field
 
 import blobfile as bf
-import numpy as np
 import torch
 
 from summarize_from_feedback.datasets import jsonl_encoding
@@ -93,6 +92,9 @@ def main(H: HParams):
                 )
                 target_reward = to_numpy(target_results["reward"])
 
+                if layout.is_replica_root:
+                    output = {**input, "original_summary_reward": original_summary_reward,
+                              "target_reward": target_reward, "iteration_{}".format(iteration) + H.output_key: rewards}
                 for iteration in range(H.number_of_iterations):
                     response_tokens = torch.tensor(input["iteration_{}_sample_tokens".format(iteration)])
                     assert_eq(response_tokens.dim(), 2)
@@ -114,10 +116,11 @@ def main(H: HParams):
                     )
                     chosen_refinement_reward = to_numpy(results["reward"].reshape((n_responses,)))
 
-
                     if layout.is_replica_root:
-                        output = {**input, "original_summary_reward": original_summary_reward, "target_reward": target_reward, "iteration_{}".format(iteration) + H.output_key: rewards, "iteration_{}_chosen_refinement_reward".format(iteration): chosen_refinement_reward}
-                        out_f.write((json.dumps(jsonl_encoding.encode_example(output)) + "\n"))
+                        output["iteration_{}_chosen_refinement_reward".format(iteration)] = chosen_refinement_reward
+
+                if layout.is_replica_root:
+                    out_f.write((json.dumps(jsonl_encoding.encode_example(output)) + "\n"))
 
             input_idx += 1
             if layout.is_replica_root:
