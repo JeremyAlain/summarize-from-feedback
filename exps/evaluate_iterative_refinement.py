@@ -50,7 +50,7 @@ def experiment_definitions():
 
 
 def prepare_results():
-    results_folder = "/Users/jeremyscheurer/Code/language_alignment/language_feedback_learning/data/results/iterative_refinement_summarization"
+    results_folder = "/home/js12882/data/iterative_refinement_results"
     prompt_types = [#"summary_feedback_refinement_summary_feedback",
             "summary_refinement_summary",
             "summary"]
