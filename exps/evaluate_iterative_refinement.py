@@ -90,10 +90,10 @@ def prepare_results():
                                           post=results_sample["post"])
                     reformated_result["context"] = context_text
                     for iteration in range(number_of_iterations):
-                        samples = []
-                        for i in range(number_of_generated_samples):
-                            samples.append(results_sample["iteration_{}_predicted_refinement_{}".format(iteration,i)])
-                        reformated_result["iteration_{}_samples".format(iteration)] = samples
+                        # samples = []
+                        # for i in range(number_of_generated_samples):
+                        #     samples.append(results_sample["iteration_{}_predicted_refinement_{}".format(iteration,i)])
+                        # reformated_result["iteration_{}_samples".format(iteration)] = samples
                         reformated_result["iteration_{}_chosen_refinement".format(iteration)] = results_sample["iteration_{}_chosen_refinement".format(iteration)]
 
                     reformated_result["original_summary"] = results_sample["text"]
@@ -114,10 +114,10 @@ def prepare_results():
 
                     for iteration in range(number_of_iterations):
                         iteration_sample_tokens = []
-                        for i in range(number_of_generated_samples):
-                            sample_tokens = response_encoder.encode_response(reformated_result["iteration_{}_samples".format(iteration)][i], allow_truncate=True)
-                            iteration_sample_tokens.append(sample_tokens)
-                        reformated_result["iteration_{}_sample_tokens".format(iteration)] = np.array(iteration_sample_tokens)
+                        # for i in range(number_of_generated_samples):
+                        #     sample_tokens = response_encoder.encode_response(reformated_result["iteration_{}_samples".format(iteration)][i], allow_truncate=True)
+                        #     iteration_sample_tokens.append(sample_tokens)
+                        # reformated_result["iteration_{}_sample_tokens".format(iteration)] = np.array(iteration_sample_tokens)
                         reformated_result["iteration_{}_chosen_refinement_tokens".format(iteration)] = response_encoder.encode_response(reformated_result["iteration_{}_chosen_refinement".format(iteration)], allow_truncate=True)
 
                     original_summary_tokens = response_encoder.encode_response(reformated_result["original_summary"], allow_truncate=True)

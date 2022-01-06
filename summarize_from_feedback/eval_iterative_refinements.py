@@ -97,15 +97,15 @@ def main(H: HParams):
                               "target_reward": target_reward}
 
                 for iteration in range(H.number_of_iterations):
-                    response_tokens = torch.tensor(input["iteration_{}_sample_tokens".format(iteration)])
-                    assert_eq(response_tokens.dim(), 2)
-                    n_responses = response_tokens.size(0)
-                    results = reward_model.reward(
-                        query_tokens=query_tokens.unsqueeze(0),
-                        response_tokens=response_tokens.unsqueeze(0),
-                        act_dtype=act_dtype,
-                    )
-                    rewards = to_numpy(results["reward"].reshape((n_responses,)))
+                    # response_tokens = torch.tensor(input["iteration_{}_sample_tokens".format(iteration)])
+                    # assert_eq(response_tokens.dim(), 2)
+                    # n_responses = response_tokens.size(0)
+                    # results = reward_model.reward(
+                    #     query_tokens=query_tokens.unsqueeze(0),
+                    #     response_tokens=response_tokens.unsqueeze(0),
+                    #     act_dtype=act_dtype,
+                    # )
+                    # rewards = to_numpy(results["reward"].reshape((n_responses,)))
 
                     chosen_refinement_tokens = torch.unsqueeze(torch.tensor(input["iteration_{}_chosen_refinement_tokens".format(iteration)]),dim=0)
                     assert_eq(chosen_refinement_tokens.dim(), 2)
@@ -119,7 +119,7 @@ def main(H: HParams):
 
                     if layout.is_replica_root:
                         output["iteration_{}_chosen_refinement_reward".format(iteration)] = chosen_refinement_reward
-                        output["iteration_{}".format(iteration) + H.output_key] = rewards
+                        #output["iteration_{}".format(iteration) + H.output_key] = rewards
 
                 if layout.is_replica_root:
                     out_f.write((json.dumps(jsonl_encoding.encode_example(output)) + "\n"))
