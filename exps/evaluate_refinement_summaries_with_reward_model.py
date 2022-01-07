@@ -75,7 +75,7 @@ def prepare_results():
 
     for prompt_type in prompt_types:
         for model in models:
-            results_file = os.path.join(results_folder, "{}_{}_tldr_summarization_results_2_shot.json".format(model, prompt_type))
+            results_file = os.path.join(results_folder, "{}_{}_gpt3_vs_dataset_results.json".format(model, prompt_type))
             if os.path.isfile(results_file):
                 reformated_results_list = []
                 results_df = pd.read_json(results_file)
