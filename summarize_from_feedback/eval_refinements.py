@@ -34,9 +34,29 @@ class HParams(hyperparams.HParams):
     number_of_iterations: int = 1
 
 #all_input_paths = ['samples.curie_summary_feedback_refinement_generate_refinement_tldr_results.jsonl', 'samples.davinci_summary_refinement_summary_tldr_results.jsonl', 'samples.ada_summary_refinement_summary_generate_summary_tldr_results.jsonl', 'samples.ada_summary_refinement_summary_generate_refinement_tldr_results.jsonl', 'samples.babbage_summary_feedback_refinement_summary_feedback_tldr_results.jsonl', 'samples.ada_refinement_tldr_results.jsonl', 'samples.davinci_summary_feedback_refinement_generate_refinement_tldr_results.jsonl', 'samples.babbage_summary_feedback_refinement_generate_summary_tldr_results.jsonl', 'samples.curie_summary_refinement_summary_generate_summary_tldr_results.jsonl', 'samples.davinci_summary_refinement_summary_generate_refinement_tldr_results.jsonl', 'samples.babbage_summary_refinement_summary_generate_summary_tldr_results.jsonl', 'samples.babbage_summary_refinement_summary_tldr_results.jsonl', 'samples.ada_summary_feedback_refinement_generate_refinement_tldr_results.jsonl', 'samples.babbage_summary_tldr_results.jsonl', 'samples.davinci_summary_feedback_refinement_summary_feedback_tldr_results.jsonl', 'samples.curie_summary_tldr_results.jsonl', 'samples.babbage_summary_feedback_refinement_generate_refinement_tldr_results.jsonl', 'samples.ada_summary_refinement_summary_tldr_results.jsonl', 'samples.davinci_summary_refinement_summary_generate_summary_tldr_results.jsonl', 'samples.curie_refinement_tldr_results.jsonl', 'samples.ada_summary_feedback_refinement_summary_feedback_tldr_results.jsonl', 'samples.curie_summary_feedback_refinement_generate_summary_tldr_results.jsonl', 'samples.davinci_summary_tldr_results.jsonl', 'samples.curie_summary_feedback_refinement_summary_feedback_tldr_results.jsonl', 'samples.ada_summary_feedback_refinement_generate_summary_tldr_results.jsonl', 'samples.babbage_summary_refinement_summary_generate_refinement_tldr_results.jsonl', 'samples.ada_summary_tldr_results.jsonl', 'samples.babbage_refinement_tldr_results.jsonl', 'samples.curie_summary_refinement_summary_generate_refinement_tldr_results.jsonl', 'samples.curie_summary_refinement_summary_tldr_results.jsonl', 'samples.davinci_refinement_tldr_results.jsonl', 'samples.davinci_summary_feedback_refinement_generate_summary_tldr_results.jsonl']
-all_input_paths = ["samples.ada_summary_tldr_results.jsonl", "samples.babbage_summary_tldr_results.jsonl", "samples.curie_summary_tldr_results.jsonl",
-                   "samples.davinci_summary_tldr_results.jsonl"]
-
+#all_input_paths = ["samples.ada_summary_tldr_results.jsonl", "samples.babbage_summary_tldr_results.jsonl", "samples.curie_summary_tldr_results.jsonl",
+#                   "samples.davinci_summary_tldr_results.jsonl"]
+all_input_paths = ["samples.ada_refinement_gpt3_vs_human_preference_dataset_results.jsonl",
+                   "samples.ada_summary_feedback_refinement_summary_feedback_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.ada_summary_feedback_refinement_summary_feedback_gpt3_vs_supervised_dataset_results.json",
+                   "samples.ada_summary_refinement_summary_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.ada_summary_refinement_summary_gpt3_vs_supervised_dataset_results.json",
+                   "samples.babbage_refinement_gpt3_vs_human_preference_dataset_results.jsonl",
+                   "samples.babbage_summary_feedback_refinement_summary_feedback_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.babbage_summary_feedback_refinement_summary_feedback_gpt3_vs_supervised_dataset_results.json",
+                   "samples.babbage_summary_refinement_summary_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.babbage_summary_refinement_summary_gpt3_vs_supervised_dataset_results.json",
+                   "samples.curie_refinement_gpt3_vs_human_preference_dataset_results.jsonl",
+                   "samples.curie_summary_feedback_refinement_summary_feedback_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.curie_summary_feedback_refinement_summary_feedback_gpt3_vs_supervised_dataset_results.json",
+                   "samples.curie_summary_refinement_summary_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.curie_summary_refinement_summary_gpt3_vs_supervised_dataset_results.json",
+                   "samples.davinci_refinement_gpt3_vs_human_preference_dataset_results.jsonl",
+                   "samples.davinci_summary_feedback_refinement_summary_feedback_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.davinci_summary_feedback_refinement_summary_feedback_gpt3_vs_supervised_dataset_results.json",
+                   "samples.davinci_summary_refinement_summary_gpt3_vs_human_preference_dataset_results.json",
+                   "samples.davinci_summary_refinement_summary_gpt3_vs_supervised_dataset_results.json"
+                   ]
 def main(H: HParams):
     H.input_path = os.path.join(H.input_path_folder, all_input_paths[H.input_path_index])
     assert os.path.isfile(H.input_path), H.input_path
