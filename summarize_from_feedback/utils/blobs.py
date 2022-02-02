@@ -58,7 +58,11 @@ def download_directory_cached(url):
     """ Given a blob storage path, caches the contents locally.
     WARNING: only use this function if contents under the path won't change!
     """
-    cache_dir = "/home/js12882/data/bf-dir-cache"
+    path = os.getcwd()
+    if "js1288s" in path:
+        cache_dir = "/home/js12882/data/bf-dir-cache"
+    else:
+        cache_dir = "/tmp/experiments"
     scheme, bucket_or_account, path = parse_url(url)
     local_path = os.path.join(cache_dir, scheme, bucket_or_account, path)
 
