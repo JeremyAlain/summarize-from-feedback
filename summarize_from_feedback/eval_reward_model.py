@@ -84,7 +84,7 @@ def main(H: HParams):
                 )
                 rewards = to_numpy(results["reward"].reshape((n_responses,)))
 
-                if "human_preference_policy" in H.results_file_path:
+                if "human_preference_policy" in input_file:
                     target_tokens = torch.tensor(input["target_tokens"])
                     target_results = reward_model.reward(
                         query_tokens=query_tokens.unsqueeze(0),
@@ -96,7 +96,7 @@ def main(H: HParams):
 
                 if layout.is_replica_root:
                     replica_rewards.append(rewards)
-                    if "human_preference_policy" in H.results_file_path:
+                    if "human_preference_policy" in input_file:
                         replica_target_rewards.append(target_reward)
                         output = {**input, H.output_key: rewards, "target_reward": target_reward}
                     else:
@@ -113,7 +113,7 @@ def main(H: HParams):
             replica_rewards = np.stack(replica_rewards, axis=0)
 
             all_rewards = reward_model.dp_comm.mpi_all_gather(replica_rewards, "rewards")
-            if "human_preference_policy" in H.results_file_path:
+            if "human_preference_policy" in input_file:
                 replica_target_rewards = np.stack(replica_target_rewards, axis=0)
                 all_target_rewards = reward_model.dp_comm.mpi_all_gather(replica_target_rewards, "target_rewards")
 
@@ -125,7 +125,7 @@ def main(H: HParams):
                     print(f"Stddev within a query: {all_rewards.std(axis=1, ddof=1).mean():.3}")
                 print(f"Stddev across queries: {all_rewards.std(axis=0, ddof=1).mean():.3}")
 
-                if "human_preference_policy" in H.results_file_path:
+                if "human_preference_policy" in input_file:
                     all_target_rewards = np.concatenate(all_target_rewards, axis=0)
                     print("-------")
                     print(f"Mean target reward: {all_target_rewards.mean():.3f}")
