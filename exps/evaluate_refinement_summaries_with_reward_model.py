@@ -50,9 +50,11 @@ def experiment_definitions():
 
 
 def prepare_results():
-    results_folder = "/home/js12882/data/tldr_results"
-    prompt_types = ["summary_feedback_refinement_summary_feedback", "summary_feedback_refinement_generate_summary", "summary_feedback_refinement_generate_refinement", "summary_refinement_summary","summary_refinement_summary_generate_summary","summary_refinement_summary_generate_refinement", "refinement", "summary"]
+    results_folder = "/home/js12882/data/gpt3_vs_data_summaries"
+    #prompt_types = ["summary_feedback_refinement_summary_feedback", "summary_feedback_refinement_generate_summary", "summary_feedback_refinement_generate_refinement", "summary_refinement_summary","summary_refinement_summary_generate_summary","summary_refinement_summary_generate_refinement", "refinement", "summary"]
+    prompt_types = ["refinement", "summary_refinement_summary", "summary_feedback_refinement_summary_feedback"]
     models = ["ada", "babbage", "curie", "davinci"]
+    datasets = ["human_preference", "supervised"]
     context_format = "SUBREDDIT: r/{subreddit}\n\nTITLE: {title}\n\nPOST: {post}\n\nTL;DR:"
     number_of_generated_samples = 5
     task_response_hparams = TaskResponseHParams()
@@ -74,61 +76,62 @@ def prepare_results():
 
     for prompt_type in prompt_types:
         for model in models:
-            results_file = os.path.join(results_folder, "{}_{}_tldr_summarization_results_2_shot.json".format(model, prompt_type))
-            if os.path.isfile(results_file):
-                reformated_results_list = []
-                results_df = pd.read_json(results_file)
-                number_of_samples = results_df.shape[0]
-                reformated_result = {}
-                for sample_id in range(number_of_samples):
-                    results_sample = results_df.iloc[sample_id]
-                    context_text = context_format.format(subreddit=results_sample["subreddit"],
-                                          title=results_sample["title"],
-                                          post=results_sample["post"])
-                    reformated_result["context"] = context_text
-                    samples = []
-                    for i in range(number_of_generated_samples):
-                        samples.append(results_sample["predicted_refinement_{}".format(i)])
+            for dataset in datasets:
+                results_file = os.path.join(results_folder, "{}_{}_gpt3_vs_{}_dataset_results.json".format(model,prompt_type, dataset, ))
+                if os.path.isfile(results_file):
+                    reformated_results_list = []
+                    results_df = pd.read_json(results_file)
+                    number_of_samples = results_df.shape[0]
+                    reformated_result = {}
+                    for sample_id in range(number_of_samples):
+                        results_sample = results_df.iloc[sample_id]
+                        context_text = context_format.format(subreddit=results_sample["subreddit"],
+                                              title=results_sample["title"],
+                                              post=results_sample["post"])
+                        reformated_result["context"] = context_text
+                        samples = []
+                        for i in range(number_of_generated_samples):
+                            samples.append(results_sample["predicted_refinement_{}".format(i)])
 
-                    reformated_result["samples"] = samples
-                    reformated_result["original_summary"] = results_sample["text"]
-                    reformated_result["target"] = results_sample["target"]
-                    extra_fields = {}
-                    extra_fields["id"] = results_sample["id"]
-                    extra_fields["subreddit"] = results_sample["subreddit"]
-                    extra_fields["title"] = results_sample["title"]
-                    extra_fields["post"] = results_sample["post"]
+                        reformated_result["samples"] = samples
+                        reformated_result["original_summary"] = results_sample["text"]
+                        reformated_result["target"] = results_sample["target"]
+                        extra_fields = {}
+                        extra_fields["id"] = results_sample["id"]
+                        extra_fields["subreddit"] = results_sample["subreddit"]
+                        extra_fields["title"] = results_sample["title"]
+                        extra_fields["post"] = results_sample["post"]
 
-                    reformated_result["extra_fields"] = extra_fields
+                        reformated_result["extra_fields"] = extra_fields
 
-                    response_encoder = tasks.ResponseEncoder(task_response_hparams, summarize_from_feedback.encoder)
-                    query_data_fields = {"subreddit":results_sample["subreddit"],
-                                          "title":results_sample["title"],
-                                          "post":results_sample["post"]}
-                    query_info = tasks.process_query(query_data_fields, encoder=summarize_from_feedback.encoder, hparams=task_hparams.query)
+                        response_encoder = tasks.ResponseEncoder(task_response_hparams, summarize_from_feedback.encoder)
+                        query_data_fields = {"subreddit":results_sample["subreddit"],
+                                              "title":results_sample["title"],
+                                              "post":results_sample["post"]}
+                        query_info = tasks.process_query(query_data_fields, encoder=summarize_from_feedback.encoder, hparams=task_hparams.query)
 
-                    all_sample_tokens = []
-                    for i in range(number_of_generated_samples):
-                        sample_tokens = response_encoder.encode_response(reformated_result["samples"][i], allow_truncate=True)
-                        all_sample_tokens.append(sample_tokens)
+                        all_sample_tokens = []
+                        for i in range(number_of_generated_samples):
+                            sample_tokens = response_encoder.encode_response(reformated_result["samples"][i], allow_truncate=True)
+                            all_sample_tokens.append(sample_tokens)
 
-                    original_summary_tokens = response_encoder.encode_response(reformated_result["original_summary"], allow_truncate=True)
-                    target_tokens = response_encoder.encode_response(reformated_result["target"], allow_truncate=True)
+                        original_summary_tokens = response_encoder.encode_response(reformated_result["original_summary"], allow_truncate=True)
+                        target_tokens = response_encoder.encode_response(reformated_result["target"], allow_truncate=True)
 
-                    reformated_result["context_tokens"] = np.array(query_info["tokens"])
-                    reformated_result["sample_tokens"] = np.array(all_sample_tokens)
-                    reformated_result["original_summary_tokens"] = np.array([original_summary_tokens])
-                    reformated_result["target_tokens"] = np.array([target_tokens])
+                        reformated_result["context_tokens"] = np.array(query_info["tokens"])
+                        reformated_result["sample_tokens"] = np.array(all_sample_tokens)
+                        reformated_result["original_summary_tokens"] = np.array([original_summary_tokens])
+                        reformated_result["target_tokens"] = np.array([target_tokens])
 
 
-                    reformated_results_list.append(encode_example(reformated_result))
-                    reformated_results_path = os.path.join(results_folder, "reformated_results")
-                    if not os.path.isdir(reformated_results_path):
-                        os.mkdir(reformated_results_path)
-                with open(os.path.join(reformated_results_path,"samples.{}_{}_tldr_results.jsonl".format(model, prompt_type)), "w") as outfile:
-                    for entry in reformated_results_list:
-                        json.dump(entry, outfile)
-                        outfile.write('\n')
+                        reformated_results_list.append(encode_example(reformated_result))
+                        reformated_results_path = os.path.join(results_folder, "reformated_results")
+                        if not os.path.isdir(reformated_results_path):
+                            os.mkdir(reformated_results_path)
+                    with open(os.path.join(reformated_results_path,"samples.{}_{}_gpt3_vs_{}_dataset_results.jsonl".format(model, prompt_type,dataset)), "w") as outfile:
+                        for entry in reformated_results_list:
+                            json.dump(entry, outfile)
+                            outfile.write('\n')
 
 if __name__ == "__main__":
     prepare_results()
