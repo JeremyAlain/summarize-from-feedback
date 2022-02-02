@@ -21,25 +21,32 @@ Evaluates a reward model on a set of query-responses examples. The output will c
 json data as the input along with an extra key containing the predicted reward.
 """
 
+all_files = ["/home/js12882/data/end_to_end/reformated_results/summary_text-davinci-001_results_reformated.jsonl",
+             "/home/js12882/data/end_to_end/reformated_results/summary_feedback_refinement_text-davinci-001_results_reformated.jsonl",
+             "/home/js12882/data/end_to_end/reformated_results/summary_refinement_text-davinci-001_results_reformated.jsonl",
+             "/home/js12882/data/end_to_end/reformated_results/summary_davinci_results_reformated.jsonl",
+             "/home/js12882/data/end_to_end/reformated_results/human_preference_policy_results_reformated.jsonl"]
 
 @dataclass
 class HParams(hyperparams.HParams):
     reward_model_spec: ModelSpec = field(default_factory=ModelSpec)
     task: TaskHParams = field(default_factory=TaskHParams)
-    results_file_path: str = None
     output_folder: str = None
     fp16_activations: bool = True
     output_key: str = "predicted_reward"
+    task_index: int = None
 
 def main(H: HParams):
-    assert os.path.isfile(H.results_file_path), H.results_file_path
+    assert H.task_index < len(all_files)
+    input_file = all_files[H.task_index]
+    assert os.path.isfile(input_file), input_file
     layout = H.reward_model_spec.run_params.all_gpu_layout()
     setup_logging_with_pacific_tz()
     act_dtype = torch.float16 if H.fp16_activations else torch.float32
     results_dir = H.output_folder
     bf.makedirs(results_dir)
 
-    experiment_name = os.path.split(H.results_file_path)[1].split(".")[0] + ".jsonl"
+    experiment_name = os.path.split(input_file)[1].split(".")[0] + ".jsonl"
     if not os.path.isdir(H.output_folder):
         os.mkdir(H.output_folder)
     output_file_name = os.path.join(H.output_folder, experiment_name)
@@ -51,7 +58,7 @@ def main(H: HParams):
         with open(os.path.join(results_dir, experiment_name +"hparams.json"), "w") as f:
             json.dump(H.to_json(), f)
 
-    input_iter = make_jsonl_samples_iter(H.results_file_path, layout=layout)
+    input_iter = make_jsonl_samples_iter(input_file, layout=layout)
 
     replica_rewards = []
     replica_target_rewards = []
