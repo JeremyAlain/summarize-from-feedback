@@ -59,7 +59,7 @@ def download_directory_cached(url):
     WARNING: only use this function if contents under the path won't change!
     """
     path = os.getcwd()
-    if "js1288s" in path:
+    if "js12882" in path:
         cache_dir = "/home/js12882/data/bf-dir-cache"
     else:
         cache_dir = "/tmp/experiments"
