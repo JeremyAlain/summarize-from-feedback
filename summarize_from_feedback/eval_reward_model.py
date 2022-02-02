@@ -39,7 +39,7 @@ def main(H: HParams):
     results_dir = H.output_folder
     bf.makedirs(results_dir)
 
-    experiment_name = os.path.split(H.results_file_path)[1].split(".")[1] + ".jsonl"
+    experiment_name = os.path.split(H.results_file_path)[1].split(".")[0] + ".jsonl"
     if not os.path.isdir(H.output_folder):
         os.mkdir(H.output_folder)
     output_file_name = os.path.join(H.output_folder, experiment_name)
@@ -54,7 +54,6 @@ def main(H: HParams):
     input_iter = make_jsonl_samples_iter(H.results_file_path, layout=layout)
 
     replica_rewards = []
-    replica_original_summary_rewards = []
     replica_target_rewards = []
 
     reward_model = RewardModel(task_hparams=H.task, spec=H.reward_model_spec, layout=layout)
@@ -105,10 +104,10 @@ def main(H: HParams):
             print(f"Wrote {input_idx} batches to {output_file_name}")
 
             replica_rewards = np.stack(replica_rewards, axis=0)
-            replica_target_rewards = np.stack(replica_target_rewards, axis=0)
 
             all_rewards = reward_model.dp_comm.mpi_all_gather(replica_rewards, "rewards")
             if "human_preference_policy" in H.results_file_path:
+                replica_target_rewards = np.stack(replica_target_rewards, axis=0)
                 all_target_rewards = reward_model.dp_comm.mpi_all_gather(replica_target_rewards, "target_rewards")
 
             if layout.replica_idx == 0:
